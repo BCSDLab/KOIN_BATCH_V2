@@ -1,5 +1,5 @@
 ---
-name: 이슈
+name: 이슈 템플릿
 about: 이슈에 대한 설명을 적어주세요.
 title: ''
 labels: ''
