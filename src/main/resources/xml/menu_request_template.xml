@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="method">getList_sp</Parameter>
+        <Parameter id="sqlid">NK_COT_MEAL_PLAN.NP_SELECT_11</Parameter>
+        <Parameter id="locale">ko</Parameter>
+    </Parameters>
+    <Dataset id="input1">
+        <ColumnInfo>
+            <Column id="CAMPUS" type="string" size="4000" />
+            <Column id="RESTURANT" type="string" size="4000" />
+            <Column id="EAT_DATE" type="string" size="4000" />
+            <Column id="EAT_TYPE" type="string" size="4000" />
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="EAT_DATE">${eatDate}</Col>
+                <Col id="EAT_TYPE">${eatType}</Col>
+                <Col id="RESTURANT">${restaurant}</Col>
+                <Col id="CAMPUS">${campus}</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>
