@@ -110,4 +110,8 @@ public class DiningMenu extends BaseEntity {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public void setIsChanged(LocalDate isChanged) {
+        this.isChanged = isChanged;
+    }
 }
