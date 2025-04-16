@@ -30,6 +30,12 @@ public enum Meal {
         this.endTime = endTime;
     }
 
+    /**
+     * 현재 시각 기준으로 해당하는 식사 시간을 반환합니다.
+     *
+     * @param clock 한국 시간대(Asia/Seoul)가 설정된 Clock 인스턴스
+     * @return 현재 시각이 속하는 Meal, 해당하지 않으면 null
+     */
     public static Meal now(Clock clock) {
         LocalTime now = LocalTime.now(clock);
         for (Meal meal : values()) {
@@ -40,6 +46,12 @@ public enum Meal {
         return null;
     }
 
+    /**
+     * 현재 시각 기준으로 남은 식사 시간을 반환합니다.
+     *
+     * @param clock 한국 시간대(Asia/Seoul)가 설정된 Clock 인스턴스
+     * @return 남은 식사 시간을 가진 Meal 리스트
+     */
     public static List<Meal> remainingMeals(Clock clock) {
         List<Meal> meals = new ArrayList<>();
         LocalTime now = LocalTime.now(clock);
