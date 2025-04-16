@@ -106,4 +106,8 @@ public class DiningMenu extends BaseEntity {
         this.likes = likes;
         this.price = price;
     }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
