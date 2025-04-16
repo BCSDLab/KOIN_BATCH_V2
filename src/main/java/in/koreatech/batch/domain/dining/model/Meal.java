@@ -1,5 +1,6 @@
 package in.koreatech.batch.domain.dining.model;
 
+import java.time.Clock;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,8 @@ public enum Meal {
         this.endTime = endTime;
     }
 
-    public static Meal now() {
-        LocalTime now = LocalTime.now();
+    public static Meal now(Clock clock) {
+        LocalTime now = LocalTime.now(clock);
         for (Meal meal : values()) {
             if (!now.isBefore(meal.startTime) && !now.isAfter(meal.endTime)) {
                 return meal;
@@ -39,9 +40,9 @@ public enum Meal {
         return null;
     }
 
-    public static List<Meal> remainingMeals() {
+    public static List<Meal> remainingMeals(Clock clock) {
         List<Meal> meals = new ArrayList<>();
-        LocalTime now = LocalTime.now();
+        LocalTime now = LocalTime.now(clock);
         for (Meal meal : values()) {
             if (now.isBefore(meal.startTime)) {
                 meals.add(meal);
