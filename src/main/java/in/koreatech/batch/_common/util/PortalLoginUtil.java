@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import in.koreatech.batch._common.auth.exception.CookieNotFoundException;
+import in.koreatech.batch._common.redis.LoginCookieRedisRepository;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.JavaNetCookieJar;
@@ -19,6 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+@Slf4j
 @Component
 public class PortalLoginUtil {
 
@@ -51,15 +54,31 @@ public class PortalLoginUtil {
 
     private final OkHttpClient okHttpClient;
     private final CookieManager cookieManager;
+    private final LoginCookieRedisRepository loginCookieRedisRepository;
 
-    public PortalLoginUtil() {
+    public PortalLoginUtil(LoginCookieRedisRepository loginCookieRedisRepository) {
         this.cookieManager = new CookieManager(null, ACCEPT_ALL);
         this.okHttpClient = new OkHttpClient.Builder()
             .cookieJar(new JavaNetCookieJar(cookieManager))
             .build();
+        this.loginCookieRedisRepository = loginCookieRedisRepository;
     }
 
-    public String getLoginCookie() throws IOException {
+    public String getOrRefreshLoginCookie() {
+        return loginCookieRedisRepository.getLoginCookie()
+            .orElseGet(() -> {
+                String newCookie = null;
+                try {
+                    newCookie = getLoginCookie();
+                } catch (IOException e) {
+                    log.warn("포털 로그인에 실패했습니다.");
+                }
+                loginCookieRedisRepository.setLoginCookie(newCookie);
+                return newCookie;
+            });
+    }
+
+    private String getLoginCookie() throws IOException {
         Headers headers = new Headers.Builder()
             .add("X-Forwarded-For", ip)
             .add("X-Real-IP", ip)
