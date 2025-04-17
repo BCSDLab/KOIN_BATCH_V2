@@ -1,11 +1,11 @@
 package in.koreatech.batch._common.redis;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
