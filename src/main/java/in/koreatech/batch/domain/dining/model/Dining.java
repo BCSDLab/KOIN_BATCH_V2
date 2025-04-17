@@ -42,7 +42,7 @@ public class Dining extends BaseEntity {
     @NotNull
     @Enumerated(STRING)
     @Column(name = "type", nullable = false)
-    private Meal type;
+    private DiningType type;
 
     @NotNull
     @Column(name = "place")
@@ -79,7 +79,7 @@ public class Dining extends BaseEntity {
     @Builder
     private Dining(
         LocalDate date,
-        Meal type,
+        DiningType type,
         String place,
         Integer priceCard,
         Integer priceCash,
