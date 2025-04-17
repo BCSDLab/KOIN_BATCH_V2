@@ -5,6 +5,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import in.koreatech.batch._common.model.BaseEntity;
 import jakarta.persistence.Column;
@@ -15,18 +16,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
-@Table(name = "dining_menus", schema = "koin", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"date", "type", "place"})
-})
+@Entity
 @NoArgsConstructor(access = PROTECTED)
-public class DiningMenu extends BaseEntity {
+@Table(name = "dining_menus", uniqueConstraints = {
+    @UniqueConstraint(
+        name = "ux_date_type_place",
+        columnNames = {"date", "type", "place"}
+    )
+})
+public class Dining extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -37,14 +40,12 @@ public class DiningMenu extends BaseEntity {
     private LocalDate date;
 
     @NotNull
-    @Size(max = 9)
     @Enumerated(STRING)
-    @Column(name = "type", length = 9)
+    @Column(name = "type", nullable = false)
     private Meal type;
 
     @NotNull
-    @Size(max = 9)
-    @Column(name = "place", length = 9)
+    @Column(name = "place")
     private String place;
 
     @Column(name = "price_card")
@@ -57,28 +58,26 @@ public class DiningMenu extends BaseEntity {
     private Integer kcal;
 
     @NotNull
-    @Column(name = "menu", columnDefinition = "TEXT")
+    @Column(name = "menu", nullable = false)
     private String menu;
 
-    @Size(max = 255)
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "sold_out")
-    private LocalDate soldOut;
+    @Column(name = "sold_out", columnDefinition = "DATETIME")
+    private LocalDateTime soldOut;
 
-    @Column(name = "is_changed")
-    private LocalDate isChanged;
+    @Column(name = "is_changed", columnDefinition = "DATETIME")
+    private LocalDateTime isChanged;
 
     @Column(name = "likes")
-    private Integer likes;
+    private Integer likes = 0;
 
     @Column(name = "price")
     private Integer price;
 
     @Builder
-    private DiningMenu(
-        Integer id,
+    private Dining(
         LocalDate date,
         Meal type,
         String place,
@@ -87,12 +86,11 @@ public class DiningMenu extends BaseEntity {
         Integer kcal,
         String menu,
         String imageUrl,
-        LocalDate soldOut,
-        LocalDate isChanged,
+        LocalDateTime soldOut,
+        LocalDateTime isChanged,
         Integer likes,
         Integer price
     ) {
-        this.id = id;
         this.date = date;
         this.type = type;
         this.place = place;
@@ -105,13 +103,5 @@ public class DiningMenu extends BaseEntity {
         this.isChanged = isChanged;
         this.likes = likes;
         this.price = price;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void setIsChanged(LocalDate isChanged) {
-        this.isChanged = isChanged;
     }
 }

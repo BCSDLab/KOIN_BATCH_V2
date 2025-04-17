@@ -10,22 +10,28 @@ import lombok.Getter;
 @Getter
 public enum Meal {
     BREAKFAST(
+        "아침",
         LocalTime.of(8, 0, 0, 0),
         LocalTime.of(9, 30, 0, 0)
     ),
     LUNCH(
+        "점심",
         LocalTime.of(11, 30, 0, 0),
         LocalTime.of(13, 30, 0, 0)
     ),
-    DINNER(LocalTime.of(17, 30, 0, 0),
+    DINNER(
+        "저녁",
+        LocalTime.of(17, 30, 0, 0),
         LocalTime.of(18, 30, 0, 0)
     ),
     ;
 
+    private final String diningName;
     private final LocalTime startTime;
     private final LocalTime endTime;
 
-    Meal(LocalTime startTime, LocalTime endTime) {
+    Meal(String diningName, LocalTime startTime, LocalTime endTime) {
+        this.diningName = diningName;
         this.startTime = startTime;
         this.endTime = endTime;
     }
