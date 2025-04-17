@@ -39,6 +39,7 @@ out/
 
 application.yml
 application-portal.yml
+application-image.yml
 *adminsdk.json
 
 logs
