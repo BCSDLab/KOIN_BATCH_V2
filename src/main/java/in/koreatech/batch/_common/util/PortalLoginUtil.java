@@ -49,28 +49,28 @@ public class PortalLoginUtil {
             .add("X-Real-IP", portalProperties.ip())
             .build();
 
-        RequestBody loginBody = new FormBody.Builder()
-            .add("login_id", portalProperties.id())
-            .add("login_pwd", portalProperties.pw())
-            .build();
-
         okHttpClient.newCall(new Request.Builder()
             .url(portalProperties.urlCheckFirstLogin())
             .headers(headers)
-            .post(loginBody)
+            .post(
+                new FormBody.Builder()
+                .add("login_id", portalProperties.id())
+                .add("login_pwd", portalProperties.pw())
+                .build()
+            )
             .build()
         ).execute().close();
 
         cookieManager.getCookieStore().add(URI.create(portalProperties.home()), new HttpCookie("kut_login_type", "id"));
 
-        RequestBody secondAuth = new FormBody.Builder()
-            .add("login_id", portalProperties.id())
-            .build();
-
         okHttpClient.newCall(new Request.Builder()
             .url(portalProperties.urlCheckSecondLogin())
             .headers(headers)
-            .post(secondAuth)
+            .post(
+                new FormBody.Builder()
+                    .add("login_id", portalProperties.id())
+                    .build()
+            )
             .build()
         ).execute().close();
 
