@@ -25,14 +25,12 @@ public class TodayDiningCrawlerReader implements ItemReader<CrawledDiningMenu> {
 
     private final Iterator<CrawledDiningMenu> crawledData;
     private final DiningCrawlerClient client;
-    private final DiningCrawlingParser parser;
     private final Clock clock;
 
     // TODO. remainingDiningType.isEmpty인 경우 크롤링 실행 x
-    public TodayDiningCrawlerReader(Clock clock, DiningCrawlerClient client, DiningCrawlingParser parser) throws IOException {
+    public TodayDiningCrawlerReader(Clock clock, DiningCrawlerClient client) throws IOException {
         this.clock = clock;
         this.client = client;
-        this.parser = parser;
 
         List<DiningType> remainingDiningTypes = DiningType.remainingDiningType(clock);
         List<CrawledDiningMenu> menus = new ArrayList<>();
@@ -56,7 +54,7 @@ public class TodayDiningCrawlerReader implements ItemReader<CrawledDiningMenu> {
                     campusType.getDisplayName()
                 );
                 if (xml != null) {
-                    menus.add(parser.parse(xml));
+                    menus.add(DiningCrawlingParser.parse(xml));
                 }
             }
         }
