@@ -14,6 +14,7 @@ import in.koreatech.batch.domain.dining.model.Dining;
 import in.koreatech.batch.domain.dining.processor.DiningProcessor;
 import in.koreatech.batch.domain.dining.reader.TodayDiningCrawlerReader;
 import in.koreatech.batch.domain.dining.repository.DiningRepository;
+import in.koreatech.batch.domain.dining.writer.DiningWriter;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -22,9 +23,9 @@ public class TodayDiningCrawlingBatch {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
-    private final DiningRepository diningRepository;
     private final TodayDiningCrawlerReader todayDiningCrawlerReader;
     private final DiningProcessor diningProcessor;
+    private final DiningWriter diningWriter;
 
     @Bean
     public Job TodayDiningCrawlingJob() {
@@ -39,6 +40,7 @@ public class TodayDiningCrawlingBatch {
             .<CrawledDiningMenu, Dining> chunk(5, platformTransactionManager)
             .reader(todayDiningCrawlerReader)
             .processor(diningProcessor)
+            .writer(diningWriter)
             .build();
     }
 }
