@@ -46,7 +46,6 @@ public class DiningCrawlingParser {
 
         String menuDump = menuJson.toPrettyString();
 
-        // 천원의 아침 이미지 확인
         String imageUrl = null;
         if (menuDump.contains("천원의아침") || menuDump.contains("천원의 아침")) {
             imageUrl = thousandWonDiningImageUrl;

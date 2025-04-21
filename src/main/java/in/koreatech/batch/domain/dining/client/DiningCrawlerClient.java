@@ -4,6 +4,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.jsoup.Jsoup;
@@ -31,9 +33,9 @@ public class DiningCrawlerClient {
     private final PortalProperties portalProperties;
     private final LoginCookieRedisRepository loginCookieRedisRepository;
 
-    public String sendRequest(String eatDate, String eatType, String restaurant, String campus) throws IOException {
+    public String sendRequest(LocalDate eatDate, String eatType, String restaurant, String campus) throws IOException {
         String xmlBody = loadAndFileTemplate(Map.of(
-            "EAT_DATE", eatDate,
+            "EAT_DATE", eatDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
             "EAT_TYPE", eatType,
             "RESTURANT", restaurant,
             "CAMPUS", campus
