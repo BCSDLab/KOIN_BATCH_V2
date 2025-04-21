@@ -12,7 +12,8 @@ public record PortalProperties(
     String home,
     String urlCheckSecondLogin,
     String urlSso,
-    String urlSsoLogin
+    String urlSsoLogin,
+    String urlDiningMenu
 ) {
 
 }
