@@ -7,8 +7,7 @@ public record CrawledDiningMenu(
     String priceCard,
     String priceCash,
     String kcal,
-    String menuJson,
-    String imageUrl
+    String menuJson
 ) {
 
 }
