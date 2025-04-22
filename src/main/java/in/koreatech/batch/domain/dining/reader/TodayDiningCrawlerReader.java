@@ -53,7 +53,7 @@ public class TodayDiningCrawlerReader implements ItemReader<CrawledDiningMenu> {
                 String xml = client.sendRequest(
                     LocalDate.now(clock),
                     diningType.name().toLowerCase(),
-                    restaurant.getDisplayName(),
+                    restaurant.getName(),
                     campusType.getDisplayEnglishName()
                 );
                 if (xml != null) {
