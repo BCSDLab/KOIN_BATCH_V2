@@ -16,10 +16,10 @@ public class LoginCookieRedisRepository {
     private final PortalProperties portalProperties;
 
     public Optional<String> getLoginCookie() {
-        return Optional.ofNullable(redisTemplate.opsForValue().get(portalProperties.cookieLogin()));
+        return Optional.ofNullable(redisTemplate.opsForValue().get(portalProperties.cookie().login()));
     }
 
     public void setLoginCookie(String cookieValue) {
-        redisTemplate.opsForValue().set(portalProperties.cookieLogin(), cookieValue);
+        redisTemplate.opsForValue().set(portalProperties.cookie().login(), cookieValue);
     }
 }

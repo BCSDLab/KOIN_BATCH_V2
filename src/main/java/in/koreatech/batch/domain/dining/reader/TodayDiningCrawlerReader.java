@@ -1,8 +1,5 @@
 package in.koreatech.batch.domain.dining.reader;
 
-import static in.koreatech.batch.domain.dining.model.CampusType.CAMPUS1;
-import static in.koreatech.batch.domain.dining.model.CampusType.CAMPUS2;
-
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -23,35 +20,41 @@ import in.koreatech.batch.domain.dining.parser.DiningCrawlingParser;
 @Component
 public class TodayDiningCrawlerReader implements ItemReader<CrawledDiningMenu> {
 
-    private final Iterator<CrawledDiningMenu> crawledData;
     private final DiningCrawlerClient client;
     private final Clock clock;
+    private Iterator<CrawledDiningMenu> crawledData = null;
 
     // TODO. remainingDiningType.isEmpty인 경우 크롤링 실행 x
     public TodayDiningCrawlerReader(Clock clock, DiningCrawlerClient client) throws IOException {
         this.clock = clock;
         this.client = client;
-
-        List<DiningType> remainingDiningTypes = DiningType.remainingDiningType(clock);
-        List<CrawledDiningMenu> menus = new ArrayList<>();
-        for (CampusType campus : List.of(CAMPUS1, CAMPUS2)) {
-            menus.addAll(crawlDining(remainingDiningTypes, campus));
-        }
-
-        this.crawledData = menus.iterator();
     }
 
-    private List<CrawledDiningMenu> crawlDining(List<DiningType> remainingDiningTypes, CampusType campusType) throws IOException {
+    @Override
+    public CrawledDiningMenu read() throws Exception {
+        if (crawledData == null) {
+            List<DiningType> remainingDiningTypes = DiningType.remainingDiningType(clock);
+            List<CrawledDiningMenu> menus = new ArrayList<>();
+            for (CampusType campus : CampusType.values()) {
+                menus.addAll(crawlingDining(remainingDiningTypes, campus));
+            }
+            this.crawledData = menus.iterator();
+        }
+
+        return crawledData.hasNext() ? crawledData.next() : null;
+    }
+
+    private List<CrawledDiningMenu> crawlingDining(List<DiningType> remainingDiningTypes, CampusType campusType) throws IOException {
         List<CrawledDiningMenu> menus = new ArrayList<>();
         List<RestaurantType> restaurants = campusType.getRestaurants();
 
-        for (DiningType remainingDiningType : remainingDiningTypes) {
-            for (RestaurantType restaurantType : restaurants) {
+        for (DiningType diningType : remainingDiningTypes) {
+            for (RestaurantType restaurant : restaurants) {
                 String xml = client.sendRequest(
                     LocalDate.now(clock),
-                    remainingDiningType.name().toLowerCase(),
-                    restaurantType.getDisplayName(),
-                    campusType.getDisplayName()
+                    diningType.name().toLowerCase(),
+                    restaurant.getDisplayName(),
+                    campusType.getDisplayEnglishName()
                 );
                 if (xml != null) {
                     menus.add(DiningCrawlingParser.parse(xml));
@@ -60,10 +63,5 @@ public class TodayDiningCrawlerReader implements ItemReader<CrawledDiningMenu> {
         }
 
         return menus;
-    }
-
-    @Override
-    public CrawledDiningMenu read() {
-        return crawledData.hasNext() ? crawledData.next() : null;
     }
 }

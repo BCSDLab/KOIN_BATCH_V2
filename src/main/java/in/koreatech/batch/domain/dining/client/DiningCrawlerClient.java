@@ -41,10 +41,12 @@ public class DiningCrawlerClient {
             "CAMPUS", campus
         ));
 
-        String cookieHeader = String.format("%s=%s; Domain=koreatech.ac.kr;", portalProperties.cookieLogin(), loginCookieRedisRepository.getLoginCookie());
+        System.out.println(xmlBody);
+
+        String cookieHeader = String.format("%s=%s;Domain=koreatech.ac.kr;", portalProperties.cookie().login(), loginCookieRedisRepository.getLoginCookie().get());
 
         Request request = new Request.Builder()
-            .url(portalProperties.urlDiningMenu())
+            .url(portalProperties.url().diningMenu())
             .addHeader("Content-Type", "text/xml; charset=utf-8")
             .addHeader("Cookie", cookieHeader)
             .post(RequestBody.create(xmlBody, MEDIA_TYPE_XML))

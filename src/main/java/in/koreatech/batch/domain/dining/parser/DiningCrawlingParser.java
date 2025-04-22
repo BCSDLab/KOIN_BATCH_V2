@@ -23,7 +23,6 @@ public class DiningCrawlingParser {
         if (rows.isEmpty()) return null;
 
         Element row = rows.get(0);
-        if (row == null) return null;
 
         ObjectNode menuJson = objectMapper.createObjectNode();
         for (Element col : row.select("Col")) {

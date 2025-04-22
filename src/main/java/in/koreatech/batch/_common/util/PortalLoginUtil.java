@@ -50,7 +50,7 @@ public class PortalLoginUtil {
             .build();
 
         okHttpClient.newCall(new Request.Builder()
-            .url(portalProperties.urlCheckFirstLogin())
+            .url(portalProperties.url().checkFirstLogin())
             .headers(headers)
             .post(
                 new FormBody.Builder()
@@ -64,7 +64,7 @@ public class PortalLoginUtil {
         cookieManager.getCookieStore().add(URI.create(portalProperties.home()), new HttpCookie("kut_login_type", "id"));
 
         okHttpClient.newCall(new Request.Builder()
-            .url(portalProperties.urlCheckSecondLogin())
+            .url(portalProperties.url().checkSecondLogin())
             .headers(headers)
             .post(
                 new FormBody.Builder()
@@ -75,14 +75,14 @@ public class PortalLoginUtil {
         ).execute().close();
 
         okHttpClient.newCall(new Request.Builder()
-            .url(portalProperties.urlSso())
+            .url(portalProperties.url().sso())
             .headers(headers)
             .post(RequestBody.create("", null))
             .build()
         ).execute().close();
 
         okHttpClient.newCall(new Request.Builder()
-            .url(portalProperties.urlSsoLogin())
+            .url(portalProperties.url().ssoLogin())
             .headers(headers)
             .get()
             .build()
@@ -90,7 +90,7 @@ public class PortalLoginUtil {
 
         List<HttpCookie> cookies = cookieManager.getCookieStore().get(URI.create(portalProperties.home()));
         return cookies.stream()
-            .filter(cookie -> portalProperties.cookieLogin().equals(cookie.getName()))
+            .filter(cookie -> portalProperties.cookie().login().equals(cookie.getName()))
             .map(HttpCookie::getValue)
             .findFirst()
             .orElseThrow(() -> CookieNotFoundException.withDetail("로그인 쿠키를 찾을 수 없습니다."));

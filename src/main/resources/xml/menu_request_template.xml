@@ -14,10 +14,10 @@
         </ColumnInfo>
         <Rows>
             <Row>
-                <Col id="EAT_DATE">${eatDate}</Col>
-                <Col id="EAT_TYPE">${eatType}</Col>
-                <Col id="RESTURANT">${restaurant}</Col>
-                <Col id="CAMPUS">${campus}</Col>
+                <Col id="EAT_DATE">${EAT_DATE}</Col>
+                <Col id="EAT_TYPE">${EAT_TYPE}</Col>
+                <Col id="RESTURANT">${RESTURANT}</Col>
+                <Col id="CAMPUS">${CAMPUS}</Col>
             </Row>
         </Rows>
     </Dataset>

@@ -8,16 +8,17 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CampusType {
-    CAMPUS1("1캠퍼스", List.of(
+    CAMPUS1("1캠퍼스", "Campus1", List.of(
         RestaurantType.KOREAN,
         RestaurantType.ILPOOM,
         RestaurantType.SPECIAL,
         RestaurantType.NEUNGSUGWAN
     )),
-    CAMPUS2("2캠퍼스", List.of(
+    CAMPUS2("2캠퍼스", "Campus2", List.of(
         RestaurantType.CORNER1
     ));
 
-    private final String displayName;
+    private final String displayHangulName;
+    private final String displayEnglishName;
     private final List<RestaurantType> restaurants;
 }

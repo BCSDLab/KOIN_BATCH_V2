@@ -4,16 +4,26 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "portal")
 public record PortalProperties(
-    String cookieLogin,
     String id,
     String pw,
     String ip,
-    String urlCheckFirstLogin,
     String home,
-    String urlCheckSecondLogin,
-    String urlSso,
-    String urlSsoLogin,
-    String urlDiningMenu
+    Cookie cookie,
+    Url url
 ) {
+    public record Cookie(
+        String login
+    ) {
 
+    }
+
+    public record Url(
+        String checkFirstLogin,
+        String checkSecondLogin,
+        String sso,
+        String ssoLogin,
+        String diningMenu
+    ) {
+
+    }
 }
