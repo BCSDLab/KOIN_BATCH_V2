@@ -4,9 +4,9 @@ public record CrawledDiningMenu(
     String date,
     String diningTime,
     String place,
-    String priceCard,
-    String priceCash,
-    String kcal,
+    Integer priceCard,
+    Integer priceCash,
+    Integer kcal,
     String menuJson
 ) {
 

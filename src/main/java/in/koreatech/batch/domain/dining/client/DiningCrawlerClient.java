@@ -1,12 +1,14 @@
 package in.koreatech.batch.domain.dining.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.jsoup.parser.Parser.xmlParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,8 +43,6 @@ public class DiningCrawlerClient {
             "CAMPUS", campus
         ));
 
-        System.out.println(xmlBody);
-
         String cookieHeader = String.format("%s=%s;Domain=koreatech.ac.kr;", portalProperties.cookie().login(), loginCookieRedisRepository.getLoginCookie().get());
 
         Request request = new Request.Builder()
@@ -57,8 +57,8 @@ public class DiningCrawlerClient {
                 throw DiningRequestException.withDetail("식단 요청에 실패했습니다");
             }
 
-            String responseBody = response.body().string();
-            Document doc = Jsoup.parse(responseBody, "", org.jsoup.parser.Parser.xmlParser());
+            String responseBody = Objects.requireNonNull(response.body()).string();
+            Document doc = Jsoup.parse(responseBody, "", xmlParser());
 
             if ("0".equals(doc.selectFirst("Parameter[id=ErrorCode]").text())) {
                 return responseBody;
