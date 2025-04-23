@@ -12,7 +12,7 @@ public record PortalProperties(
 ) {
     public record Url(
         String home,
-        String checkFirstLogin,
+        String checkLoginId,
         String checkSecondLogin,
         String sso,
         String ssoLogin
