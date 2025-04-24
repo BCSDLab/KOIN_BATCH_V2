@@ -28,7 +28,7 @@ public class CityBusClient {
     private final BusProperties busProperties;
     private final OkHttpClient okHttpClient;
 
-    public List<Integer> getCityBusRouteIds(Integer cityBusRoute) {
+    public List<Integer> requestCityBusRouteIds(Integer cityBusRoute) {
         Request request = new Request.Builder()
             .url(String.format(busProperties.url().routeId(), cityBusRoute))
             .build();
