@@ -1,4 +1,4 @@
-package in.koreatech.batch.config;
+package in.koreatech.batch._common.config;
 
 import javax.sql.DataSource;
 
