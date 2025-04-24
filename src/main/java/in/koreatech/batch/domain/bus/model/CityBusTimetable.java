@@ -47,7 +47,8 @@ public class CityBusTimetable {
     private LocalDateTime updatedAt;
 
     @Builder
-    private CityBusTimetable(BusInfo busInfo, List<BusTimetable> busTimetables, LocalDateTime updatedAt) {
+    private CityBusTimetable(String routeId, BusInfo busInfo, List<BusTimetable> busTimetables, LocalDateTime updatedAt) {
+        this.routeId = routeId;
         this.busInfo = busInfo;
         this.busTimetables = busTimetables;
         this.updatedAt = updatedAt;
