@@ -18,6 +18,8 @@ public class CityBusTimetableWriter implements ItemWriter<CityBusTimetable> {
 
     @Override
     public void write(Chunk<? extends CityBusTimetable> chunk) {
-        cityBusTimetableBatchRepository.saveAll((List<CityBusTimetable>)chunk);
+        if (!chunk.isEmpty()) {
+            cityBusTimetableBatchRepository.saveAll((List<CityBusTimetable>)chunk.getItems());
+        }
     }
 }
