@@ -38,6 +38,7 @@ out/
 .DS_STORE
 
 application.yml
+application-bus.yml
 *adminsdk.json
 
 logs
