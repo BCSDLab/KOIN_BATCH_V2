@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -27,13 +29,13 @@ public class DataDBConfig {
 
     private final DataDBProperties dataDBProperties;
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-data")
+    @Bean(name = "dataDBSource")
+    @ConfigurationProperties(prefix = "spring.datasource.koin")
     public DataSource dataDBSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean
+    @Bean(name = "dataEntityManager")
     public LocalContainerEntityManagerFactoryBean dataEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataDBSource());
@@ -48,10 +50,10 @@ public class DataDBConfig {
         return em;
     }
 
-    @Bean
-    public PlatformTransactionManager dataTransactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(dataEntityManager().getObject());
-        return transactionManager;
+    @Bean(name = "dataTransactionManager")
+    public PlatformTransactionManager dataTransactionManager(
+        @Qualifier(value = "dataEntityManager") EntityManagerFactory entityManagerFactory
+    ) {
+        return new JpaTransactionManager(entityManagerFactory);
     }
 }

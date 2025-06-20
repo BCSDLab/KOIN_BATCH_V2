@@ -14,14 +14,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class MetaDBConfig {
 
     @Primary
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-meta")
+    @Bean(name = "metaDBDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.koin-batch")
     public DataSource metaDBDataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Primary
-    @Bean
+    @Bean(name = "metaTransactionManager")
     public PlatformTransactionManager metaTransactionManager() {
         return new DataSourceTransactionManager(metaDBDataSource());
     }
