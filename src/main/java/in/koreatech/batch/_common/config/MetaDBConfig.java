@@ -15,7 +15,7 @@ public class MetaDBConfig {
 
     @Primary
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-meta")
+    @ConfigurationProperties(prefix = "spring.datasource.koin-batch")
     public DataSource metaDBDataSource() {
         return DataSourceBuilder.create().build();
     }

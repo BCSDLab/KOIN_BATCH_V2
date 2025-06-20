@@ -2,7 +2,7 @@ package in.koreatech.batch._common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "spring.datasource-data.hibernate")
+@ConfigurationProperties(prefix = "spring.datasource.koin.hibernate")
 public record DataDBProperties(
     String ddlAuto,
     Boolean showSql,

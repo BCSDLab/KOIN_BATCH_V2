@@ -28,7 +28,7 @@ public class DataDBConfig {
     private final DataDBProperties dataDBProperties;
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-data")
+    @ConfigurationProperties(prefix = "spring.datasource.koin")
     public DataSource dataDBSource() {
         return DataSourceBuilder.create().build();
     }
