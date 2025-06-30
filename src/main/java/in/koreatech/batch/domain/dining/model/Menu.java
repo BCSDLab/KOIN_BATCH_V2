@@ -1,5 +1,6 @@
 package in.koreatech.batch.domain.dining.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,7 +26,9 @@ public record Menu(
         LocalDateTime soldOut,
         LocalDateTime isChanged,
         Integer likes
-) {
+) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // 복합 유니크 키: date, type, place
     @Override
