@@ -7,8 +7,8 @@ import java.net.CookieManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import in.koreatech.batch.domain.portal.client.PortalLoginCookieJar;
 import lombok.RequiredArgsConstructor;
-import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 
 @Configuration
@@ -18,12 +18,12 @@ public class OkHttpClientConfig {
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder()
-            .cookieJar(new JavaNetCookieJar(cookieManager()))
+            .cookieJar(new PortalLoginCookieJar(cookieManager()))
             .build();
     }
 
     @Bean
     public CookieManager cookieManager() {
-       return new CookieManager(null, ACCEPT_ALL);
+        return new CookieManager(null, ACCEPT_ALL);
     }
 }
