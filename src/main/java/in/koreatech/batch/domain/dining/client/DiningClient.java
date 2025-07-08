@@ -1,6 +1,7 @@
 package in.koreatech.batch.domain.dining.client;
 
 import java.io.IOException;
+import java.net.CookieManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class DiningClient {
             </Root>""";
 
     private final OkHttpClient okHttpClient;
+    private final CookieManager cookieManager;
 
     public List<Menu> crawlWeekDiningMenus(String loginToken) {
         LocalDate today = LocalDate.now();
@@ -110,11 +112,8 @@ public class DiningClient {
             if (!response.isSuccessful()) {
                 throw new RuntimeException("식단 요청 실패: " + response.code() + " / " + response.message());
             }
-
-            String responseBody = response.body().string();
-            System.out.println("Response:\n" + responseBody);
-
-            return MenuParser.parse(responseBody);
+            cookieManager.getCookieStore().removeAll();
+            return MenuParser.parse(response.body().string());
         } catch (IOException e) {
             throw new RuntimeException("식단 요청 중 IOException 발생", e);
         }
