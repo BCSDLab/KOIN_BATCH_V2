@@ -19,6 +19,7 @@ import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourc
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,12 +32,10 @@ import in.koreatech.batch.domain.dining.repository.MenuRepository;
 import in.koreatech.batch.domain.dining.util.DiningTimeUtil;
 import in.koreatech.batch.domain.dining.util.MenuComparator;
 import in.koreatech.batch.domain.portal.client.PortalLoginClient;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class DiningJobConfig {
 
     private final JobRepository jobRepository;
@@ -45,6 +44,22 @@ public class DiningJobConfig {
     private final DiningClient diningClient;
     private final DataSource dataDBSource;
     private final MenuRepository menuRepository;
+
+    public DiningJobConfig(
+        JobRepository jobRepository,
+        @Qualifier(value = "dataTransactionManager") PlatformTransactionManager transactionManager,
+        PortalLoginClient loginClient,
+        DiningClient diningClient,
+        DataSource dataDBSource,
+        MenuRepository menuRepository
+    ) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.loginClient = loginClient;
+        this.diningClient = diningClient;
+        this.dataDBSource = dataDBSource;
+        this.menuRepository = menuRepository;
+    }
 
     /**
      * 1. 아우누리 식단을 크롤링한다.
@@ -66,14 +81,14 @@ public class DiningJobConfig {
     @Bean
     public Job crawlDiningMenusJob() {
         return new JobBuilder("crawlDiningMenusJob", jobRepository)
-                .start(ensureLoginStep())
-                .next(crawlMenusStep())
-                .next(updateMenusStep())
-                .next(checkMealTimeStep())
-                .on("NOT_MEAL_TIME").end() // 식사시간 아니면 종료
-                .from(checkMealTimeStep()).on("*").to(crawlCurrentMenuStep()) // 식사시간이면 메뉴 크롤링
-                .end()
-                .build();
+            .start(ensureLoginStep())
+            .next(crawlMenusStep())
+            .next(updateMenusStep())
+            .next(checkMealTimeStep())
+            .on("NOT_MEAL_TIME").end() // 식사시간 아니면 종료
+            .from(checkMealTimeStep()).on("*").to(crawlCurrentMenuStep()) // 식사시간이면 메뉴 크롤링
+            .end()
+            .build();
     }
 
     /**
@@ -82,12 +97,12 @@ public class DiningJobConfig {
     @Bean
     public Step ensureLoginStep() {
         return new StepBuilder("ensureLoginStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    JobExecution jobExecution = contribution.getStepExecution().getJobExecution();
-                    jobExecution.getExecutionContext().put("loginToken", loginClient.getOrRefreshLoginCookie());
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
+            .tasklet((contribution, chunkContext) -> {
+                JobExecution jobExecution = contribution.getStepExecution().getJobExecution();
+                jobExecution.getExecutionContext().put("loginToken", loginClient.getOrRefreshLoginCookie());
+                return RepeatStatus.FINISHED;
+            }, transactionManager)
+            .build();
     }
 
     /**
@@ -96,17 +111,17 @@ public class DiningJobConfig {
     @Bean
     public Step crawlMenusStep() {
         return new StepBuilder("crawlMealsStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    String loginToken = (String)chunkContext.getStepContext().getJobExecutionContext()
-                            .get("loginToken");
-                    List<Menu> menus = diningClient.crawlWeekDiningMenus(loginToken);
+            .tasklet((contribution, chunkContext) -> {
+                String loginToken = (String)chunkContext.getStepContext().getJobExecutionContext()
+                    .get("loginToken");
+                List<Menu> menus = diningClient.crawlWeekDiningMenus(loginToken);
 
-                    JobExecution jobExecution = contribution.getStepExecution().getJobExecution();
-                    jobExecution.getExecutionContext().put("menus", menus);
+                JobExecution jobExecution = contribution.getStepExecution().getJobExecution();
+                jobExecution.getExecutionContext().put("menus", menus);
 
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
+                return RepeatStatus.FINISHED;
+            }, transactionManager)
+            .build();
     }
 
     /**
@@ -115,19 +130,19 @@ public class DiningJobConfig {
     @Bean
     public Step updateMenusStep() {
         return new StepBuilder("updateMealsStep", jobRepository)
-                .<Menu, Menu>chunk(10, transactionManager)
-                .reader(new ItemReader<>() { // 크롤링 데이터 가져오기
+            .<Menu, Menu>chunk(10, transactionManager)
+            .reader(new ItemReader<>() { // 크롤링 데이터 가져오기
 
-                    @Value("#{stepExcution.jobExcution.excutionContext['menus']}")
-                    private LinkedList<Menu> menus;
+                @Value("#{stepExcution.jobExcution.excutionContext['menus']}")
+                private LinkedList<Menu> menus;
 
-                    @Override
-                    public Menu read() {
-                        return (menus == null || menus.isEmpty()) ? null : menus.poll();
-                    }
-                })
-                .writer(menuUpsertWriter())
-                .build();
+                @Override
+                public Menu read() {
+                    return (menus == null || menus.isEmpty()) ? null : menus.poll();
+                }
+            })
+            .writer(menuUpsertWriter())
+            .build();
     }
 
     /**
@@ -136,19 +151,19 @@ public class DiningJobConfig {
     @Bean
     public JdbcBatchItemWriter<Menu> menuUpsertWriter() {
         return new JdbcBatchItemWriterBuilder<Menu>()
-                .dataSource(dataDBSource)
-                .sql("""
-                            INSERT INTO koin.dining_menus(date, type, place, price_card, price_cash, kcal, menu, image_url, is_changed)
-                            VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, NULL)
-                            ON DUPLICATE KEY UPDATE
-                              price_card = :priceCard,
-                              price_cash = :priceCash,
-                              kcal = :kcal,
-                              menu = :menu,
-                              is_changed = :isChanged
-                        """)
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .build();
+            .dataSource(dataDBSource)
+            .sql("""
+                    INSERT INTO koin.dining_menus(date, type, place, price_card, price_cash, kcal, menu, image_url, is_changed)
+                    VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, NULL)
+                    ON DUPLICATE KEY UPDATE
+                      price_card = :priceCard,
+                      price_cash = :priceCash,
+                      kcal = :kcal,
+                      menu = :menu,
+                      is_changed = :isChanged
+                """)
+            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+            .build();
     }
 
     /**
@@ -157,15 +172,15 @@ public class DiningJobConfig {
     @Bean
     public Step checkMealTimeStep() {
         return new StepBuilder("checkMealTimeStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    if (DiningTimeUtil.isMealTimeNow()) {
-                        return RepeatStatus.FINISHED;
-                    } else {
-                        contribution.setExitStatus(new ExitStatus("NOT_MEAL_TIME"));
-                        return RepeatStatus.FINISHED;
-                    }
-                }, transactionManager)
-                .build();
+            .tasklet((contribution, chunkContext) -> {
+                if (DiningTimeUtil.isMealTimeNow()) {
+                    return RepeatStatus.FINISHED;
+                } else {
+                    contribution.setExitStatus(new ExitStatus("NOT_MEAL_TIME"));
+                    return RepeatStatus.FINISHED;
+                }
+            }, transactionManager)
+            .build();
     }
 
     /**
@@ -174,47 +189,47 @@ public class DiningJobConfig {
     @Bean
     public Step crawlCurrentMenuStep() {
         return new StepBuilder("crawlCurrentMenuStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    if (!DiningTimeUtil.isMealTimeNow()) {
-                        log.info("식사 시간이 아닙니다. Job 종료.");
-                        return RepeatStatus.FINISHED;
-                    }
-
-                    // read
-                    String loginToken = loginClient.getOrRefreshLoginCookie();
-                    List<Menu> newMenus = diningClient.crawlCurrentDiningMenu(loginToken, LocalDateTime.now());
-                    List<Menu> oldMenus = menuRepository.findByDateAndType(
-                            LocalDateTime.now().toLocalDate(),
-                            DiningType.fromTime(LocalDateTime.now().toLocalTime()).name()
-                    );
-
-                    // process
-                    List<Menu> menus = MenuComparator.checkDuplicationMenu(newMenus, oldMenus);
-
-                    // write
-                    if (!menus.isEmpty()) {
-                        JdbcBatchItemWriter<Menu> writer = new JdbcBatchItemWriterBuilder<Menu>()
-                                .dataSource(dataDBSource)
-                                .sql("""
-                                          INSERT INTO koin.dining_menus(date, type, place, price_card, price_cash, kcal, menu, image_url, is_changed)
-                                          VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, NULL)
-                                          ON DUPLICATE KEY UPDATE
-                                            price_card = :priceCard,
-                                            price_cash = :priceCash,
-                                            kcal = :kcal,
-                                            menu = :menu,
-                                            is_changed = :isChanged
-                                        """)
-                                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                                .build();
-                        writer.afterPropertiesSet();
-                        writer.write(new Chunk<>(menus));
-                        log.info("식단 정보가 변경되어 DB를 업데이트했습니다.");
-                    }
-
+            .tasklet((contribution, chunkContext) -> {
+                if (!DiningTimeUtil.isMealTimeNow()) {
+                    log.info("식사 시간이 아닙니다. Job 종료.");
                     return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
+                }
+
+                // read
+                String loginToken = loginClient.getOrRefreshLoginCookie();
+                List<Menu> newMenus = diningClient.crawlCurrentDiningMenu(loginToken, LocalDateTime.now());
+                List<Menu> oldMenus = menuRepository.findByDateAndType(
+                    LocalDateTime.now().toLocalDate(),
+                    DiningType.fromTime(LocalDateTime.now().toLocalTime()).name()
+                );
+
+                // process
+                List<Menu> menus = MenuComparator.checkDuplicationMenu(oldMenus, newMenus);
+
+                // write
+                if (!menus.isEmpty()) {
+                    JdbcBatchItemWriter<Menu> writer = new JdbcBatchItemWriterBuilder<Menu>()
+                        .dataSource(dataDBSource)
+                        .sql("""
+                              INSERT INTO koin.dining_menus(date, type, place, price_card, price_cash, kcal, menu, image_url, is_changed)
+                              VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, NULL)
+                              ON DUPLICATE KEY UPDATE
+                                price_card = :priceCard,
+                                price_cash = :priceCash,
+                                kcal = :kcal,
+                                menu = :menu,
+                                is_changed = :isChanged
+                            """)
+                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                        .build();
+                    writer.afterPropertiesSet();
+                    writer.write(new Chunk<>(menus));
+                    log.info("식단 정보가 변경되어 DB를 업데이트했습니다.");
+                }
+
+                return RepeatStatus.FINISHED;
+            }, transactionManager)
+            .build();
     }
 
     /**
@@ -224,7 +239,7 @@ public class DiningJobConfig {
     @Bean
     public Job mealMenuPollingJob() {
         return new JobBuilder("mealMenuPollingJob", jobRepository)
-                .start(crawlCurrentMenuStep())
-                .build();
+            .start(crawlCurrentMenuStep())
+            .build();
     }
 }
