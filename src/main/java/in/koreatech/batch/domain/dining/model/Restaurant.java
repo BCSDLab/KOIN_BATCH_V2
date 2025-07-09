@@ -28,4 +28,13 @@ public enum Restaurant {
     public String toString() {
         return korean;
     }
+
+    public static String parseDBName(String restaurant) {
+        for (Restaurant r : Restaurant.values()) {
+            if (restaurant.contains(r.korean)) {
+                return r.dbName;
+            }
+        }
+        return null;
+    }
 }
