@@ -2,9 +2,12 @@ package in.koreatech.batch.domain.dining.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -17,10 +20,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.koreatech.batch.domain.dining.model.Menu;
+import in.koreatech.batch.domain.dining.model.Restaurant;
 
 public class MenuParser {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Pattern KCAL_WON_PATTERN = Pattern.compile("\\d+\\s*kcal\\s+[^\\s]+\\s*원");
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d+");
 
     public static Menu parse(String xmlResponse) {
         Document doc = Jsoup.parse(xmlResponse, "", Parser.xmlParser());
@@ -40,17 +46,12 @@ public class MenuParser {
         // 필수 필드 추출
         LocalDate date = parseLocalDate(row.get("EAT_DATE")); // e.g., "2025-06-29"
         String type = row.get("EAT_TYPE");
-        String place = row.get("RESTURANT");
-        Integer priceCard = parseInt(row.get("PRICE_CARD"));
-        Integer priceCash = parseInt(row.get("PRICE_CASH"));
+        String place = Restaurant.parseDBName(row.get("RESTURANT"));
+        PriceResult priceResult = parseCash(row.get("PRICE"));
+        Integer priceCard = priceResult.priceCard;
+        Integer priceCash = priceResult.priceCash;
         Integer kcal = parseInt(row.get("KCAL"));
-
-        // menu 항목은 MENU1, MENU2... 등을 리스트로 추출
-        List<String> menuItems = row.entrySet().stream()
-                .filter(e -> e.getKey().startsWith("MENU"))
-                .map(Map.Entry::getValue)
-                .filter(v -> v != null && !v.isBlank())
-                .collect(Collectors.toList());
+        List<String> menuItems = parseMenu(row.get("DISH"));
 
         String menuJson;
         try {
@@ -102,6 +103,59 @@ public class MenuParser {
             return value == null ? null : Integer.parseInt(value);
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    private static List<String> parseMenu(String menu) {
+        if (menu == null || menu.isBlank()) return List.of();
+
+        String cleaned = KCAL_WON_PATTERN.matcher(menu).replaceAll("").trim();
+
+        return Arrays.stream(cleaned.split("\\s+"))
+            .map(String::trim)
+            .filter(s -> !s.isBlank())
+            .collect(Collectors.toList());
+    }
+
+    private static PriceResult parseCash(String priceText) {
+        try {
+            if (priceText == null || priceText.isBlank()) {
+                return new PriceResult(null, null);
+            }
+
+            String cleaned = priceText.replace(",", "").replaceAll("\\s+", "");
+            Matcher matcher = DIGIT_PATTERN.matcher(cleaned);
+
+            Integer first = null;
+            Integer second = null;
+
+            if (matcher.find()) {
+                first = Integer.parseInt(matcher.group());
+            }
+            if (matcher.find()) {
+                second = Integer.parseInt(matcher.group());
+            }
+
+            if (first != null && second != null) {
+                return new PriceResult(first, second);
+            } else if (first != null) {
+                return new PriceResult(first, first);
+            } else {
+                return new PriceResult(null, null);
+            }
+
+        } catch (Exception e) {
+            return new PriceResult(null, null);
+        }
+    }
+
+    public static class PriceResult {
+        public final Integer priceCard;
+        public final Integer priceCash;
+
+        public PriceResult(Integer priceCard, Integer priceCash) {
+            this.priceCard = priceCard;
+            this.priceCash = priceCash;
         }
     }
 }
