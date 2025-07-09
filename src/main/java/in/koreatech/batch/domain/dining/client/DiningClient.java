@@ -78,7 +78,10 @@ public class DiningClient {
         List<Menu> menus = new ArrayList<>();
         for (Restaurant restaurant : Restaurant.values()) {
             try {
-                menus.add(crawlDiningMenu(loginToken, today, diningType, restaurant, "Campus1"));
+                Menu menu = crawlDiningMenu(loginToken, today, diningType, restaurant, "Campus1");
+                if (menu != null) {
+                    menus.add(menu);
+                }
             } catch (RuntimeException e) {
                 System.err.println("현재 메뉴 크롤링 중 오류 발생: " + e.getMessage());
             }
