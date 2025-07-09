@@ -25,6 +25,13 @@ public enum DiningType {
         throw new IllegalArgumentException("No DiningType found for the given time: " + time);
     }
 
+    public static boolean isMealTimeNow() {
+        LocalTime now = LocalTime.now();
+        return (now.isAfter(BREAKFAST.startTime) && now.isBefore(BREAKFAST.endTime)) ||
+            (now.isAfter(LUNCH.startTime) && now.isBefore(LUNCH.endTime)) ||
+            (now.isAfter(DINNER.startTime) && now.isBefore(DINNER.endTime));
+    }
+
     public LocalTime getStartTime() {
         return startTime;
     }

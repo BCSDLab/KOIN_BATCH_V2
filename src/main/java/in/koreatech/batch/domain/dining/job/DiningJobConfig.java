@@ -29,7 +29,6 @@ import in.koreatech.batch.domain.dining.client.DiningClient;
 import in.koreatech.batch.domain.dining.model.DiningType;
 import in.koreatech.batch.domain.dining.model.Menu;
 import in.koreatech.batch.domain.dining.repository.MenuRepository;
-import in.koreatech.batch.domain.dining.util.DiningTimeUtil;
 import in.koreatech.batch.domain.dining.util.MenuComparator;
 import in.koreatech.batch.domain.portal.client.PortalLoginClient;
 import lombok.extern.slf4j.Slf4j;
@@ -173,7 +172,7 @@ public class DiningJobConfig {
     public Step checkMealTimeStep() {
         return new StepBuilder("checkMealTimeStep", jobRepository)
             .tasklet((contribution, chunkContext) -> {
-                if (DiningTimeUtil.isMealTimeNow()) {
+                if (DiningType.isMealTimeNow()) {
                     return RepeatStatus.FINISHED;
                 } else {
                     contribution.setExitStatus(new ExitStatus("NOT_MEAL_TIME"));
@@ -190,7 +189,7 @@ public class DiningJobConfig {
     public Step crawlCurrentMenuStep() {
         return new StepBuilder("crawlCurrentMenuStep", jobRepository)
             .tasklet((contribution, chunkContext) -> {
-                if (!DiningTimeUtil.isMealTimeNow()) {
+                if (!DiningType.isMealTimeNow()) {
                     log.info("식사 시간이 아닙니다. Job 종료.");
                     return RepeatStatus.FINISHED;
                 }

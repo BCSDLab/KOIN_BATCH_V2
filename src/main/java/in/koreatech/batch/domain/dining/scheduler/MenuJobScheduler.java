@@ -6,7 +6,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import in.koreatech.batch.domain.dining.util.DiningTimeUtil;
+import in.koreatech.batch.domain.dining.model.DiningType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +20,7 @@ public class MenuJobScheduler {
 
     @Scheduled(fixedDelay = 10000) // 10초마다 실행
     public void runMealMenuPollingJob() {
-        if (!DiningTimeUtil.isMealTimeNow()) {
+        if (!DiningType.isMealTimeNow()) {
             log.info("식사시간 종료됨. 반복 중단.");
             return; // polling 중단
         }
