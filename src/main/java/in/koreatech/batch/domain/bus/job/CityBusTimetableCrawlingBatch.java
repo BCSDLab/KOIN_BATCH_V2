@@ -28,14 +28,14 @@ public class CityBusTimetableCrawlingBatch {
     private final CityBusTimetableProcessor cityBusTimetableProcessor;
 
     @Bean
-    public Job CityBusTimetableCrawlingBatchJob() {
+    public Job cityBusTimetableCrawlingBatchJob() {
         return new JobBuilder("cityBusTimetableCrawlingBatchJob", jobRepository)
-            .start(CityBusTimetableCrawlingStep())
+            .start(cityBusTimetableCrawlingStep())
             .build();
     }
 
     @Bean
-    public Step CityBusTimetableCrawlingStep() {
+    public Step cityBusTimetableCrawlingStep() {
         return new StepBuilder("cityBusTimetableCrawlingBatchJob", jobRepository)
             .<CityBusRouteInfo, CityBusTimetable> chunk(10, platformTransactionManager)
             .reader(routeIdReader)
