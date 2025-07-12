@@ -33,15 +33,21 @@ public class MenuComparator {
             }
 
             // 3. 기존과 menu 내용(menu 필드)만 다른 경우
-            if (!Objects.equals(oldMenu.menu(), newMenu.menu())) {
-                // record는 불변이므로 새로 복사
-                Menu updatedMenu = new Menu(
-                        newMenu.id(), newMenu.date(), newMenu.type(), newMenu.place(),
-                        newMenu.priceCard(), newMenu.priceCash(), newMenu.kcal(),
-                        newMenu.menu(), newMenu.imageUrl(), newMenu.soldOut(),
-                        LocalDateTime.now(), // isChanged set
-                        newMenu.likes()
-                );
+            if (!Objects.equals(oldMenu.getMenu(), newMenu.getMenu())) {
+                Menu updatedMenu = Menu.builder()
+                    .id(newMenu.getId())
+                    .date(newMenu.getDate())
+                    .type(newMenu.getType())
+                    .place(newMenu.getPlace())
+                    .priceCard(newMenu.getPriceCard())
+                    .priceCash(newMenu.getPriceCash())
+                    .kcal(newMenu.getKcal())
+                    .menu(newMenu.getMenu())
+                    .imageUrl(newMenu.getImageUrl())
+                    .soldOut(newMenu.getSoldOut())
+                    .isChanged(LocalDateTime.now())
+                    .likes(newMenu.getLikes())
+                    .build();
                 result.add(updatedMenu);
             }
         }
@@ -52,7 +58,7 @@ public class MenuComparator {
     // 복합키 비교용 도우미 클래스
     private record MenuKey(LocalDate date, String type, String place) {
         public static MenuKey from(Menu menu) {
-            return new MenuKey(menu.date(), menu.type().toUpperCase(), menu.place());
+            return new MenuKey(menu.getDate(), menu.getType().toUpperCase(), menu.getPlace());
         }
     }
 }

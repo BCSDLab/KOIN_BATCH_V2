@@ -17,6 +17,7 @@ public class MenuJobScheduler {
 
     private final JobLauncher jobLauncher;
     private final Job mealMenuPollingJob;
+    private final Job crawlDiningMenusJob;
 
     @Scheduled(fixedDelay = 10000) // 10초마다 실행
     public void runMealMenuPollingJob() {
@@ -41,7 +42,7 @@ public class MenuJobScheduler {
     public void updateBreakfastMenu() {
         try {
             jobLauncher.run(
-                mealMenuPollingJob,
+                crawlDiningMenusJob,
                 new JobParametersBuilder()
                     .addLong("timestamp", System.currentTimeMillis())
                     .toJobParameters()
@@ -55,7 +56,7 @@ public class MenuJobScheduler {
     public void updateLunchMenu() {
         try {
             jobLauncher.run(
-                mealMenuPollingJob,
+                crawlDiningMenusJob,
                 new JobParametersBuilder()
                     .addLong("timestamp", System.currentTimeMillis())
                     .toJobParameters()
@@ -70,7 +71,7 @@ public class MenuJobScheduler {
     public void updateDinnerMenu() {
         try {
             jobLauncher.run(
-                mealMenuPollingJob,
+                crawlDiningMenusJob,
                 new JobParametersBuilder()
                     .addLong("timestamp", System.currentTimeMillis())
                     .toJobParameters()
