@@ -43,6 +43,10 @@ public class PortalLoginClient {
             });
     }
 
+    public void refreshLoginCookie() throws IOException {
+        getLoginCookie();
+    }
+
     private String getLoginCookie() throws IOException {
         Headers headers = new Headers.Builder()
             .add("X-Forwarded-For", portalProperties.ip())
