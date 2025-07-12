@@ -49,7 +49,7 @@ public class DiningJobConfig {
         @Qualifier(value = "dataTransactionManager") PlatformTransactionManager transactionManager,
         PortalLoginClient loginClient,
         DiningClient diningClient,
-        DataSource dataDBSource,
+        @Qualifier(value = "dataDBSource") DataSource dataDBSource,
         MenuRepository menuRepository
     ) {
         this.jobRepository = jobRepository;
