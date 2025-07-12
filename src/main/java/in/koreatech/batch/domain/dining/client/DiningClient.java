@@ -1,5 +1,8 @@
 package in.koreatech.batch.domain.dining.client;
 
+import static in.koreatech.batch.domain.dining.model.Restaurant.SECOND_CAMPUS;
+import static in.koreatech.batch.domain.dining.model.Restaurant.values;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,7 +60,7 @@ public class DiningClient {
         List<Menu> menus = new ArrayList<>();
         for (LocalDate date = today; !date.isAfter(endDate); date = date.plusDays(1)) {
             for (DiningType diningType : DiningType.values()) {
-                for (Restaurant restaurant : Restaurant.values()) {
+                for (Restaurant restaurant : values()) {
                     try {
                         Menu menu = crawlDiningMenu(loginToken, date, diningType, restaurant, "Campus1");
                         if (menu != null) {
@@ -66,6 +69,10 @@ public class DiningClient {
                     } catch (RuntimeException e) {
                         System.err.println("식단 크롤링 중 오류 발생: " + e.getMessage());
                     }
+                }
+                Menu menu = crawlDiningMenu(loginToken, date, diningType, SECOND_CAMPUS, "Campus2");
+                if (menu != null) {
+                    menus.add(menu);
                 }
             }
         }
@@ -76,7 +83,7 @@ public class DiningClient {
         LocalDate today = dateTime.toLocalDate();
         DiningType diningType = DiningType.fromTime(dateTime.toLocalTime());
         List<Menu> menus = new ArrayList<>();
-        for (Restaurant restaurant : Restaurant.values()) {
+        for (Restaurant restaurant : values()) {
             try {
                 Menu menu = crawlDiningMenu(loginToken, today, diningType, restaurant, "Campus1");
                 if (menu != null) {
@@ -84,6 +91,10 @@ public class DiningClient {
                 }
             } catch (RuntimeException e) {
                 System.err.println("현재 메뉴 크롤링 중 오류 발생: " + e.getMessage());
+            }
+            Menu menu = crawlDiningMenu(loginToken, today, diningType, SECOND_CAMPUS, "Campus2");
+            if (menu != null) {
+                menus.add(menu);
             }
         }
         return menus;
