@@ -49,7 +49,7 @@ public class DiningJobConfig {
         @Qualifier(value = "dataTransactionManager") PlatformTransactionManager transactionManager,
         PortalLoginClient loginClient,
         DiningClient diningClient,
-        DataSource dataDBSource,
+        @Qualifier(value = "dataDBSource") DataSource dataDBSource,
         MenuRepository menuRepository
     ) {
         this.jobRepository = jobRepository;
@@ -211,7 +211,7 @@ public class DiningJobConfig {
                         .dataSource(dataDBSource)
                         .sql("""
                               INSERT INTO koin.dining_menus(date, type, place, price_card, price_cash, kcal, menu, image_url, is_changed)
-                              VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, NULL)
+                              VALUES (:date, :type, :place, :priceCard, :priceCash, :kcal, :menu, :imageUrl, :isChanged)
                               ON DUPLICATE KEY UPDATE
                                 price_card = :priceCard,
                                 price_cash = :priceCash,
