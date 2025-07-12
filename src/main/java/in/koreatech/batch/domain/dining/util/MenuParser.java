@@ -45,7 +45,7 @@ public class MenuParser {
 
         // 필수 필드 추출
         LocalDate date = parseLocalDate(row.get("EAT_DATE")); // e.g., "2025-06-29"
-        String type = row.get("EAT_TYPE");
+        String type = row.get("EAT_TYPE").toUpperCase();
         String place = Restaurant.parseDBName(row.get("RESTURANT"));
         PriceResult priceResult = parseCash(row.get("PRICE"));
         Integer priceCard = priceResult.priceCard;

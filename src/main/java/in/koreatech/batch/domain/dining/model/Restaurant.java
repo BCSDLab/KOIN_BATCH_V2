@@ -6,6 +6,7 @@ public enum Restaurant {
     B_CORNER("일품", "B코너"),
     C_CORNER("특식-전골/뚝배기", "C코너"),
     NEUNGSUGWAN("능수관", "능수관"),
+    SECOND_CAMPUS("코너1", "2캠퍼스")
     ;
 
     private final String korean;
