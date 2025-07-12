@@ -66,20 +66,20 @@ public class MenuParser {
             imageUrl = "https://team-kap-koin-storage.s3.ap-northeast-2.amazonaws.com/dining/%EC%B2%9C%EC%9B%90%EC%9D%98%EC%95%84%EC%B9%A8.png";
         }
 
-        return new Menu(
-                null,               // id → 없음
-                date,
-                type,
-                place,
-                priceCard,
-                priceCash,
-                kcal,
-                menuJson,
-                imageUrl,
-                null,               // soldOut → 없음
-                null,               // isChanged → 없음
-                null                // likes → 없음
-        );
+        return Menu.builder()
+            .id(null)
+            .date(date)
+            .type(type)
+            .place(place)
+            .priceCash(priceCash)
+            .priceCard(priceCard)
+            .kcal(kcal)
+            .menu(menuJson)
+            .imageUrl(imageUrl)
+            .soldOut(null)
+            .isChanged(null)
+            .likes(null)
+            .build();
     }
 
     private static Map<String, String> parseRow(Element row) {
