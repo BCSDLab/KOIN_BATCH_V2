@@ -33,9 +33,10 @@ public class CityBusTimetable {
      */
     private static final Integer ADDITIONAL_TIME_DEPART_TO_STATION = 7;
 
+    // 코인 API의 경우 String으로 관리
     @Id
     @Field("_id")
-    private String routeId;
+    private Integer routeId;
 
     @Field("bus_info")
     private BusInfo busInfo;
@@ -47,7 +48,7 @@ public class CityBusTimetable {
     private LocalDateTime updatedAt;
 
     @Builder
-    private CityBusTimetable(String routeId, BusInfo busInfo, List<BusTimetable> busTimetables, LocalDateTime updatedAt) {
+    private CityBusTimetable(Integer routeId, BusInfo busInfo, List<BusTimetable> busTimetables, LocalDateTime updatedAt) {
         this.routeId = routeId;
         this.busInfo = busInfo;
         this.busTimetables = busTimetables;

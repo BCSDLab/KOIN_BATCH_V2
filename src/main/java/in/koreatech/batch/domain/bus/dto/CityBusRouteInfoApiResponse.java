@@ -13,7 +13,7 @@ public record CityBusRouteInfoApiResponse(
     public record CityBusRouteInfo(
 
         @JsonProperty("ROUTE_ID")
-        Long routeId,
+        Integer routeId,
 
         @JsonProperty("ROUTE_NAME")
         String routeName,

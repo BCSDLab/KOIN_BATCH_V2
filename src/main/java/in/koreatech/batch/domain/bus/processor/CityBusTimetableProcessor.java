@@ -35,7 +35,7 @@ public class CityBusTimetableProcessor implements ItemProcessor<CityBusRouteInfo
         List<BusTimetable> timetables = parseTimetables(document);
 
         return CityBusTimetable.builder()
-            .routeId(item.routeId().toString())
+            .routeId(item.routeId())
             .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
             .busInfo(
                 BusInfo.builder()
