@@ -132,7 +132,7 @@ public class DiningJobConfig {
             .<Menu, Menu>chunk(10, transactionManager)
             .reader(new ItemReader<>() { // 크롤링 데이터 가져오기
 
-                @Value("#{stepExcution.jobExcution.excutionContext['menus']}")
+                @Value("#{stepExecution.jobExecution.executionContext['menus']}")
                 private LinkedList<Menu> menus;
 
                 @Override
