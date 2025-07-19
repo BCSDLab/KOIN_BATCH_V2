@@ -10,6 +10,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -62,27 +63,27 @@ public class DiningJobConfig {
 
     /**
      * 1. 아우누리 식단을 크롤링한다.
-     * 1. redis에 저장된 쿠키가 있으면 사용한다.
-     * 2. redis에 저장된 쿠키가 없으면 아우누리에 로그인하여 쿠키를 저장한다.
+     *   1. redis에 저장된 쿠키가 있으면 사용한다.
+     *   2. redis에 저장된 쿠키가 없으면 아우누리에 로그인하여 쿠키를 저장한다.
      * 2. 크롤링한 식단 정보를 DB에 저장한다.
-     * 1. DB에 저장된 식단 정보와 비교하여 변경된 식단이 있으면 업데이트한다.
-     * 2. 이 때는 식단이 변경되어도 is_changed를 업데이트하지 않는다.
-     * 3. 식단에 '천원의 아침'이 포함되어있으면 image_url에 천원의 아침 이미지 url을 삽입한다.
+     *   1. DB에 저장된 식단 정보와 비교하여 변경된 식단이 있으면 업데이트한다.
+     *   2. 이 때는 식단이 변경되어도 is_changed를 업데이트하지 않는다.
+     *   3. 식단에 '천원의 아침'이 포함되어있으면 image_url에 천원의 아침 이미지 url을 삽입한다.
      * 3. 현재 시간이 식사 시간인지 확인한다.
      * 4. 식사시간이 아니면 종료된다.
      * 5. 식사시간이면 현재 식사시간 메뉴를 크롤링한다.
      * 6. 이전에 크롤링했던 메뉴 정보와 새로 크롤링한 메뉴 정보를 비교한다.
      * 7. 변경된 메뉴가 있으면 DB를 업데이트한다.
-     * 1. 이 때는 is_changed를 현재 시간으로 업데이트한다.
+     *   1. 이 때는 is_changed를 현재 시간으로 업데이트한다.
      * 8. 식사시간이 끝날 때까지 5번부터 반복한다.
      */
 
     @Bean
-    public Job crawlDiningMenusJob() {
+    public Job crawlDiningMenusJob(Step updateMenusStep) {
         return new JobBuilder("crawlDiningMenusJob", jobRepository)
             .start(ensureLoginStep())
             .next(crawlMenusStep())
-            .next(updateMenusStep())
+            .next(updateMenusStep)
             .next(checkMealTimeStep())
             .on("NOT_MEAL_TIME").end() // 식사시간 아니면 종료
             .from(checkMealTimeStep()).on("*").to(crawlCurrentMenuStep()) // 식사시간이면 메뉴 크롤링
@@ -116,7 +117,7 @@ public class DiningJobConfig {
                 List<Menu> menus = diningClient.crawlWeekDiningMenus(loginToken);
 
                 JobExecution jobExecution = contribution.getStepExecution().getJobExecution();
-                jobExecution.getExecutionContext().put("menus", menus);
+                jobExecution.getExecutionContext().put("menus", new LinkedList<>(menus));
 
                 return RepeatStatus.FINISHED;
             }, transactionManager)
@@ -127,21 +128,20 @@ public class DiningJobConfig {
      * 크롤링 데이터 영속화
      */
     @Bean
-    public Step updateMenusStep() {
+    public Step updateMenusStep(ItemReader<Menu> menuItemReader) {
         return new StepBuilder("updateMealsStep", jobRepository)
             .<Menu, Menu>chunk(10, transactionManager)
-            .reader(new ItemReader<>() { // 크롤링 데이터 가져오기
-
-                @Value("#{stepExecution.jobExecution.executionContext['menus']}")
-                private LinkedList<Menu> menus;
-
-                @Override
-                public Menu read() {
-                    return (menus == null || menus.isEmpty()) ? null : menus.poll();
-                }
-            })
+            .reader(menuItemReader)
             .writer(menuUpsertWriter())
             .build();
+    }
+
+    @StepScope
+    @Bean
+    public ItemReader<Menu> menuItemReader(
+        @Value("#{jobExecutionContext['menus']}") LinkedList<Menu> menus
+    ) {
+        return () -> (menus == null || menus.isEmpty()) ? null : menus.poll();
     }
 
     /**
