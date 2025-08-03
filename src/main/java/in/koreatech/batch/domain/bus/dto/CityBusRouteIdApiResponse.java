@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record CityBusRouteIdApiResponse(
     List<InnerRoute> resultList
 ) {
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record InnerRoute(
         @JsonProperty("ROUTE_ID")
