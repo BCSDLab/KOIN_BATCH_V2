@@ -1,7 +1,7 @@
 package in.koreatech.batch.domain.bus.client;
 
 import static in.koreatech.batch.domain.bus.dto.CityBusRouteIdApiResponse.InnerRoute;
-import static in.koreatech.batch.domain.bus.dto.CityBusRouteInfoApiResponse.*;
+import static in.koreatech.batch.domain.bus.dto.CityBusRouteInfoApiResponse.CityBusRouteInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
