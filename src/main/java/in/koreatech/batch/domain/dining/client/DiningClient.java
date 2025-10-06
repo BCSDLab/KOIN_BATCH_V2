@@ -113,7 +113,7 @@ public class DiningClient {
         Request request = new Request.Builder()
             .url("https://kut90.koreatech.ac.kr/nexacroController.do")
             .header("Content-Type", "text/xml; charset=utf-8")
-            .addHeader("Cookie", "__KSMSID__=" + loginToken + ";Domain=koreatech.ac.kr;")
+            .addHeader("Cookie", "JSESSIONID=" + loginToken + ";Domain=kut90.koreatech.ac.kr;")
             .post(RequestBody.create(
                 requestBody,
                 MediaType.parse("text/xml; charset=utf-8")
