@@ -59,7 +59,7 @@ public class PortalLoginClient {
             .post(
                 new FormBody.Builder()
                     .add("login_id", portalProperties.id())
-                    .add("login_pwd", portalProperties.pw())
+                    .add("login_pwd", portalProperties.securePw())
                     .build()
             )
             .build()
